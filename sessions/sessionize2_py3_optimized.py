@@ -13,9 +13,6 @@ __date__ ="$Nov. 8, 2012 11:58:37 AM$"
 #__author__="himarsha"
 #__date__ ="$Nov. 27, 2021 10:17:15 AM$"
 
-#ipDict
-#For each ip
-#   ua: line
 
 def calculate_sessions(last_ip,ipDict):    
     robot= 0
@@ -64,17 +61,18 @@ def calculate_sessions(last_ip,ipDict):
         #                      print newitem
                 except:
                     continue
-
-            w.write(newitem);
+            newitem = newitem.encode('utf_8')
+            w.write(newitem)
     #print("\n")
 
 
 if __name__ == "__main__":
-    fh = open(sys.argv[1],'r')
+    fh = gzip.open(sys.argv[1],'r')
     lines = fh.readlines()
     last_line = len(lines)
+    #lines = lines.decode("utf-8") 
 
-    w = open(sys.argv[2],'w')   
+    w = gzip.open(sys.argv[2],'w')   
 
     ipDict = {}
 
@@ -82,6 +80,7 @@ if __name__ == "__main__":
     count = 1
 
     for line in lines: 
+        line = line.decode("utf-8") 
         list = line.split(' ');
 
         this_ip = list[0]
