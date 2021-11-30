@@ -67,88 +67,63 @@ def calculate_sessions(last_ip,ipDict):
 
 
 if __name__ == "__main__":
-    fh = gzip.open(sys.argv[1],'r')
-    lines = fh.readlines()
-    last_line = len(lines)
-    #lines = lines.decode("utf-8") 
+    with gzip.open(sys.argv[1],'r') as fh: 
+        w = gzip.open(sys.argv[2],'w') 
+        last_line = int(sys.argv[3])
+        ipDict = {}
+        last_ip = 0
+        count = 1
+        for line in fh: 
+            line = line.decode("utf-8") 
+            list = line.split(' ');
 
-    w = gzip.open(sys.argv[2],'w')   
-
-    ipDict = {}
-
-    last_ip = 0
-    count = 1
-
-    for line in lines: 
-        line = line.decode("utf-8") 
-        list = line.split(' ');
-
-        this_ip = list[0]
-        this_ip = this_ip.strip()
-        #print(this_ip)
-        
-        # if len(list[3])<2:
-        #     continue;
-
-        agent = "";
-        for i in range(11, len(list)):
-            agent = agent +" "+list[i]
-        agent = agent[2:-2].lower()
-
-        if last_ip == this_ip:
-            is_newIP = False
-            #print("A")
-        else:
-            is_newIP = True
-            #print("B")
-
-        #print(ipDict.keys())
-
-        if not is_newIP:
-            #print("Same IP")
-            #Not a new IP - same session
-            #save things in dictionairy (adding)
-            #ipDict[agent] = [line]
-            if agent not in ipDict.keys():
-                ipDict[agent] = [line]
-            else:
-                ipdipaua = ipDict[agent]
-                ipdipaua.append(line)
-
-
-        if is_newIP:  
-            #print("new IP")
-            #New ip - new session         
-            #check if there is a dict then process the dictionairy           
-            if ipDict:
-                #print("Next IP")    
-                #dictionary is NOT empty
-                #print(ipDict["IP"])
-                #process the dictionary - calculate sessions    
-                calculate_sessions(last_ip,ipDict)
-                #break
-                #then create new dictionairy(initialize+plus that line)  
-                ipDict = {}
-                #ipDict["IP"] = this_ip
-                ipDict[agent] = [line]
-                #print(ipDict["IP"])
-            else:
-                #print("First run")  
-                #dictionary is empty
-                #first run
-                #ipDict["IP"] = this_ip                
-                #print(ipDict["IP"])   
-                ipDict[agent] = [line]
-                #print(ipDict.keys())
-
-        if count == last_line:
-            #print("EOF")  
-            calculate_sessions(last_ip,ipDict)
+            this_ip = list[0]
+            this_ip = this_ip.strip()
             
-        last_ip = this_ip 
-        print(count)
-        count = count + 1 
-        #break
-    #print(len(ipDict))   
-    #print(len(ipDict.keys())) 
-    w.close()
+            # if len(list[3])<2:
+            #     continue;
+
+            agent = "";
+            for i in range(11, len(list)):
+                agent = agent +" "+list[i]
+            agent = agent[2:-2].lower()
+
+            if last_ip == this_ip:
+                is_newIP = False
+            else:
+                is_newIP = True
+
+            if not is_newIP:
+                #Not a new IP - same session
+                #save things in dictionairy (adding)
+                if agent not in ipDict.keys():
+                    ipDict[agent] = [line]
+                else:
+                    ipdipaua = ipDict[agent]
+                    ipdipaua.append(line)
+
+
+            if is_newIP:  
+                #New ip - new session         
+                #check if there is a dict then process the dictionairy           
+                if ipDict:
+                    #dictionary is NOT empty
+                    #process the dictionary - calculate sessions    
+                    calculate_sessions(last_ip,ipDict)
+                    #then create new dictionairy(initialize+plus that line)  
+                    ipDict = {}
+                    ipDict[agent] = [line]
+                else:
+                    #dictionary is empty
+                    #first run
+                    ipDict[agent] = [line]
+
+            if count == last_line:
+                #End of file  
+                calculate_sessions(last_ip,ipDict)
+                
+            last_ip = this_ip 
+            print(count)
+            count = count + 1 
+        w.close()
+ 
